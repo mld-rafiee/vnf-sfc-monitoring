@@ -1,1 +1,7 @@
 .DS_Store
+comp_deployment.yaml
+firewall_deployment.yaml
+firewall2_deployment.yaml
+nat_deployment.yaml
+enc_deployment.yaml
+dpi_deployment.yaml

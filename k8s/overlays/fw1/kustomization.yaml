@@ -1,0 +1,74 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+patches:
+  - target:
+      kind: PersistentVolume
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: firewall-app-pv
+      - op: replace
+        path: /spec/capacity/storage
+        value: 1Gi   # Only 1Gi for firewall1
+  - target:
+      kind: PersistentVolumeClaim
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: firewall-app-pvc
+      - op: replace
+        path: /spec/resources/requests/storage
+        value: 1Gi
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: firewall-app
+      - op: replace
+        path: /spec/selector/matchLabels/app
+        value: firewall-app
+      - op: replace
+        path: /spec/template/metadata/labels/app
+        value: firewall-app
+      - op: replace
+        path: /spec/template/spec/nodeSelector/kubernetes.io~1hostname
+        value: worker1
+      - op: replace
+        path: /spec/template/spec/containers/0/name
+        value: firewall-app
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: mldrafiee/firewall-vnf:latest
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "1500m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "2048Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/volumeMounts/0/name
+        value: firewall-storage
+      - op: replace
+        path: /spec/template/spec/volumes/0/name
+        value: firewall-storage
+      - op: replace
+        path: /spec/template/spec/volumes/0/persistentVolumeClaim/claimName
+        value: firewall-app-pvc
+      # ADD the environment variable (unique to firewall1)
+      - op: add
+        path: /spec/template/spec/containers/0/env
+        value:
+          - name: average_processing_delay
+            value: "123"
+  - target:
+      kind: Service
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: firewall-service
+      - op: replace
+        path: /spec/selector/app
+        value: firewall-app

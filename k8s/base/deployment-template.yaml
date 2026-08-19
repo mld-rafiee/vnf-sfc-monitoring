@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: PLACEHOLDER_NAME
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: PLACEHOLDER_NAME
+  template:
+    metadata:
+      labels:
+        app: PLACEHOLDER_NAME
+    spec:
+      hostNetwork: true
+      nodeSelector:
+        kubernetes.io/hostname: PLACEHOLDER_NODE
+      containers:
+        - name: PLACEHOLDER_NAME
+          image: PLACEHOLDER_IMAGE
+          resources:
+            limits:
+              cpu: PLACEHOLDER_CPU
+              memory: PLACEHOLDER_MEM
+          volumeMounts:
+            - name: PLACEHOLDER_VOLUME_NAME
+              mountPath: /queue-data
+      volumes:
+        - name: PLACEHOLDER_VOLUME_NAME
+          persistentVolumeClaim:
+            claimName: PLACEHOLDER_PVC_CLAIM

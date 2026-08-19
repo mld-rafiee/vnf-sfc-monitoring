@@ -1,0 +1,83 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+patches:
+  - target:
+      kind: PersistentVolume
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: firewall2-app-pv
+      - op: replace
+        path: /spec/capacity/storage
+        value: 5Gi
+  - target:
+      kind: PersistentVolumeClaim
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: firewall2-app-pvc
+      - op: replace
+        path: /spec/resources/requests/storage
+        value: 5Gi
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: firewall2-app
+      - op: replace
+        path: /spec/selector/matchLabels/app
+        value: firewall2-app
+      - op: replace
+        path: /spec/template/metadata/labels/app
+        value: firewall2-app
+      - op: replace
+        path: /spec/template/spec/nodeSelector/kubernetes.io~1hostname
+        value: worker5
+      - op: replace
+        path: /spec/template/spec/containers/0/name
+        value: firewall2-app
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: mldrafiee/firewall2-vnf:latest
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "200m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "200Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/volumeMounts/0/name
+        value: fw2-storage
+      - op: replace
+        path: /spec/template/spec/volumes/0/name
+        value: fw2-storage
+      - op: replace
+        path: /spec/template/spec/volumes/0/persistentVolumeClaim/claimName
+        value: firewall2-app-pvc
+      # ADD environment variable
+      - op: add
+        path: /spec/template/spec/containers/0/env
+        value:
+          - name: INTERFACE
+            value: "enp3s0"
+      # ADD securityContext
+      - op: add
+        path: /spec/template/spec/securityContext
+        value:
+          runAsUser: 0
+          capabilities:
+            add:
+              - NET_ADMIN
+              - NET_RAW
+  - target:
+      kind: Service
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: firewall2-service
+      - op: replace
+        path: /spec/selector/app
+        value: firewall2-app

@@ -1,0 +1,77 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+patches:
+  - target:
+      kind: PersistentVolume
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: dpi-app-pv
+      - op: replace
+        path: /spec/capacity/storage
+        value: 5Gi
+  - target:
+      kind: PersistentVolumeClaim
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: dpi-app-pvc
+      - op: replace
+        path: /spec/resources/requests/storage
+        value: 5Gi
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: dpi-app
+      - op: replace
+        path: /spec/selector/matchLabels/app
+        value: dpi-app
+      - op: replace
+        path: /spec/template/metadata/labels/app
+        value: dpi-app
+      - op: replace
+        path: /spec/template/spec/nodeSelector/kubernetes.io~1hostname
+        value: worker2
+      - op: replace
+        path: /spec/template/spec/containers/0/name
+        value: dpi-app
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: mldrafiee/dpi2-vnf:latest
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/cpu
+        value: "200m"
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/limits/memory
+        value: "200Mi"
+      - op: replace
+        path: /spec/template/spec/containers/0/volumeMounts/0/name
+        value: dpi-storage   # (Note: DPI originally had no volumeMounts, but we keep it consistent)
+      - op: replace
+        path: /spec/template/spec/volumes/0/name
+        value: dpi-storage
+      - op: replace
+        path: /spec/template/spec/volumes/0/persistentVolumeClaim/claimName
+        value: dpi-app-pvc
+      # ADD securityContext for DPI
+      - op: add
+        path: /spec/template/spec/securityContext
+        value:
+          runAsUser: 0
+          capabilities:
+            add:
+              - NET_ADMIN
+              - NET_RAW
+  - target:
+      kind: Service
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: dpi-service
+      - op: replace
+        path: /spec/selector/app
+        value: dpi-app
