@@ -22,7 +22,7 @@ Navigate to the repository root and run the following command to deploy **all si
 
 ```bash
 kubectl apply -k ./k8s/overlays/
-
+```
 
 ## 🚦 Traffic Generation
 
@@ -36,3 +36,4 @@ Navigate to the generator directory and run the orchestrator:
 cd traffic-generator
 python orchestrator_SFC1.py
 python orchestrator_SFC2.py
+```
