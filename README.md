@@ -45,3 +45,26 @@ cd traffic-generator
 python orchestrator_SFC1.py
 python orchestrator_SFC2.py
 ```
+
+## 📊 VNF Performance Monitor
+
+The performance monitor is a centralized observability service that monitor, aggregates, and stores real‑time operational data from the entire Service Function Chain.
+
+Located in `vnf-performance-monitor/`, it runs as a multi‑threaded Flask server that continuously tracks both **application‑level performance metrics** (reported directly by the VNFs) and **infrastructure‑level metrics** (scraped from the Kubernetes API).
+
+### Key Capabilities
+
+- **Application metrics**: Each VNF pushes its processing delay and traffic load to dedicated REST endpoints.
+- **Resource Telemetry**: Directly queries the Kubernetes Metrics API to capture actual CPU and memory usage for each pod, alongside the requested resource limits.
+- **Crash Detection**: Monitors pod restarts, `OOMKilled` events, and states like `CrashLoopBackOff` to instantly flag reliability issues.
+- **Time‑Series Storage**: All incoming metrics are written to a local SQLite database, timestamped, and structured for easy querying and post‑experiment analysis.
+
+
+### Run the Performance Monitor
+
+Navigate to the monitor directory and start the service:
+
+```bash
+cd vnf-performance-monitor
+python Monitor_performance_VNF.py
+```
