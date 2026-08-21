@@ -5,3 +5,5 @@ firewall2_deployment.yaml
 nat_deployment.yaml
 enc_deployment.yaml
 dpi_deployment.yaml
+
+traffic-generator/data/NortNetEdge.csv

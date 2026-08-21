@@ -1,5 +1,13 @@
 # VNF-SFC-Monitoring
 
+## 🧩 Components
+
+- **VNFs**: Five network functions (Firewall, DPI, Encryption, Compression, NAT) implemented as Python services.
+- **Kubernetes Manifests**: Kustomize‑based deployment files for multi‑node computing continuum environment.
+- **Traffic Generator**: Emulates IoT sensor data at scale using real‑world bandwidth traces.
+- **Performance Metrics Monitor**: monitoring server that monitors VNF metrics, Kubernetes pod stats, and crash events.
+
+
 ## 🚀 Deployment
 
 This project uses **Kustomize** (built into `kubectl`) to manage the Kubernetes manifests for all six VNF instances across the two Service Function Chains (SFCs).
