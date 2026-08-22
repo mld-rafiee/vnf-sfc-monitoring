@@ -1,18 +1,19 @@
-from flask import Flask, request, jsonify
 import sqlite3
-from kubernetes import client, config
 import subprocess
 import time
 import concurrent.futures
 import threading
+from kubernetes import client, config
 from datetime import datetime, timedelta
-
+from flask import Flask, request, jsonify
 from collections import deque
+
+
 
 # Configuration
 namespace = 'default'
 interval = 1
-TIMEOUT_SECONDS = 5  # Consider VNF crashed if no update in 5 seconds
+TIMEOUT_SECONDS = 5  
 
 app = Flask(__name__)
 
@@ -150,303 +151,9 @@ def nat():
     return jsonify({"status": "success"}), 200
 
 
-# def get_pod_details_firewall():
-#     global crash_logger_global
-#     config.load_kube_config(config_file="/home/ubuntu/.kube/config")
-#     v1 = client.CoreV1Api()
-#     try:
-#         result = subprocess.run(["kubectl", "top", "pod", "-l", "app=firewall-app", "--containers"], 
-#                               capture_output=True, text=True)
-
-#         if result.returncode != 0 or not result.stdout:
-#             stderr_lines = result.stderr.split()
-#             pod_name = None
-#             for part in stderr_lines:
-#                 if 'firewall-app' in part:
-#                     pod_name = part.split('/')[-1].rstrip(',')
-#                     break
-
-#             pod = v1.read_namespaced_pod(name=pod_name, namespace='default')  
-#             cpu_request = pod.spec.containers[0].resources.requests['cpu']
-#             memory_request = pod.spec.containers[0].resources.requests['memory']
-
-#             is_crashed_now = crash_logger_global.get_count("firewall-app") 
-
-#             return cpu_request, memory_request, "0", "0", is_crashed_now
-        
-#         parts = result.stdout.split()
-#         pod_name = parts[4]
-#         pod = v1.read_namespaced_pod(name=pod_name, namespace='default')  
-#         cpu_request = pod.spec.containers[0].resources.requests['cpu']
-#         memory_request = pod.spec.containers[0].resources.requests['memory']
-#         cpu_usage = parts[6] or "0"
-#         memory_usage = parts[7] or "0"
-
-#         is_crashed_now = crash_logger_global.get_count("firewall-app") 
-
-#         return cpu_request, memory_request, cpu_usage, memory_usage, is_crashed_now
-#     except Exception as e:
-#         print(f"Error retrieving firewall pod details: {e}")
-#         is_crashed_now = crash_logger_global.get_count("firewall-app") 
-#         return "0", "0", "0", "0", is_crashed_now
-
-# def get_pod_details_dpi():
-#     global crash_logger_global
-#     config.load_kube_config(config_file="/home/ubuntu/.kube/config")
-#     v1 = client.CoreV1Api()
-#     try:
-#         result = subprocess.run(["kubectl", "top", "pod", "-l", "app=dpi-app", "--containers"], 
-#                               capture_output=True, text=True)
-
-#         if result.returncode != 0 or not result.stdout:
-#             stderr_lines = result.stderr.split()
-#             pod_name = None
-#             for part in stderr_lines:
-#                 if 'dpi-app' in part:
-#                     pod_name = part.split('/')[-1].rstrip(',')
-#                     break
-
-#             pod = v1.read_namespaced_pod(name=pod_name, namespace='default')  
-#             cpu_request = pod.spec.containers[0].resources.requests['cpu']
-#             memory_request = pod.spec.containers[0].resources.requests['memory']
-            
-#             is_crashed_now = crash_logger_global.get_count("dpi-app") 
-
-#             return cpu_request, memory_request, "0", "0", is_crashed_now
-        
-#         parts = result.stdout.split()
-#         pod_name = parts[4]
-#         pod = v1.read_namespaced_pod(name=pod_name, namespace='default')  
-#         cpu_request = pod.spec.containers[0].resources.requests['cpu']
-#         memory_request = pod.spec.containers[0].resources.requests['memory']
-#         cpu_usage = parts[6] or "0"
-#         memory_usage = parts[7] or "0"
-
-#         is_crashed_now = crash_logger_global.get_count("dpi-app") 
-
-#         return cpu_request, memory_request, cpu_usage, memory_usage, is_crashed_now
-#     except Exception as e:
-#         print(f"Error retrieving dpi pod details: {e}")
-#         is_crashed_now = crash_logger_global.get_count("dpi-app") 
-#         return "0", "0", "0", "0", is_crashed_now
-
-# def get_pod_details_enc():
-#     global crash_logger_global
-#     config.load_kube_config(config_file="/home/ubuntu/.kube/config")
-#     v1 = client.CoreV1Api()
-#     try:
-#         result = subprocess.run(["kubectl", "top", "pod", "-l", "app=enc-app", "--containers"], 
-#                               capture_output=True, text=True)
-
-#         if result.returncode != 0 or not result.stdout:
-#             stderr_lines = result.stderr.split()
-#             pod_name = None
-#             for part in stderr_lines:
-#                 if 'enc-app' in part:
-#                     pod_name = part.split('/')[-1].rstrip(',')
-#                     break
-
-#             pod = v1.read_namespaced_pod(name=pod_name, namespace='default')  
-#             cpu_request = pod.spec.containers[0].resources.requests['cpu']
-#             memory_request = pod.spec.containers[0].resources.requests['memory']
-
-#             is_crashed_now = crash_logger_global.get_count("enc-app")
-
-#             return cpu_request, memory_request, "0", "0", is_crashed_now
-
-#         parts = result.stdout.split()
-#         pod_name = parts[4]
-#         pod = v1.read_namespaced_pod(name=pod_name, namespace='default')  
-#         cpu_request = pod.spec.containers[0].resources.requests['cpu']
-#         memory_request = pod.spec.containers[0].resources.requests['memory']
-#         cpu_usage = parts[6] or "0"
-#         memory_usage = parts[7] or "0"
-
-#         is_crashed_now = crash_logger_global.get_count("enc-app") 
-
-#         return cpu_request, memory_request, cpu_usage, memory_usage, is_crashed_now
-#     except Exception as e:
-#         print(f"Error retrieving enc pod details: {e}")
-#         is_crashed_now = crash_logger_global.get_count("enc-app")
-#         return "0", "0", "0", "0", is_crashed_now
-
-# def get_pod_details_comp():
-#     global crash_logger_global
-#     config.load_kube_config(config_file="/home/ubuntu/.kube/config")
-#     v1 = client.CoreV1Api()
-#     try:
-#         result = subprocess.run(["kubectl", "top", "pod", "-l", "app=comp-app", "--containers"], 
-#                               capture_output=True, text=True)
-        
-#         if result.returncode != 0 or not result.stdout:
-#             stderr_lines = result.stderr.split()
-#             pod_name = None
-#             for part in stderr_lines:
-#                 if 'comp-app' in part:
-#                     pod_name = part.split('/')[-1].rstrip(',')
-#                     break
-
-#             pod = v1.read_namespaced_pod(name=pod_name, namespace='default')  
-#             cpu_request = pod.spec.containers[0].resources.requests['cpu']
-#             memory_request = pod.spec.containers[0].resources.requests['memory']
-
-#             is_crashed_now = crash_logger_global.get_count("comp-app")
-
-#             return cpu_request, memory_request, "0", "0", is_crashed_now
-        
-#         parts = result.stdout.split()
-#         pod_name = parts[4]
-#         pod = v1.read_namespaced_pod(name=pod_name, namespace='default')  
-#         cpu_request = pod.spec.containers[0].resources.requests['cpu']
-#         memory_request = pod.spec.containers[0].resources.requests['memory']
-#         cpu_usage = parts[6] or "0"
-#         memory_usage = parts[7] or "0"
-
-#         is_crashed_now = crash_logger_global.get_count("comp-app") 
-
-#         return cpu_request, memory_request, cpu_usage, memory_usage, is_crashed_now
-    
-#     except Exception as e:
-#         print(f"Error retrieving comp pod details: {e}")
-#         is_crashed_now = crash_logger_global.get_count("comp-app") 
-#         return "0", "0", "0", "0", is_crashed_now
-
-# def get_pod_details_firewall2():
-#     global crash_logger_global
-#     config.load_kube_config(config_file="/home/ubuntu/.kube/config")
-#     v1 = client.CoreV1Api()
-#     try:
-#         result = subprocess.run(["kubectl", "top", "pod", "-l", "app=firewall2-app", "--containers"], 
-#                               capture_output=True, text=True)
-
-#         if result.returncode != 0 or not result.stdout:
-#             stderr_lines = result.stderr.split()
-#             pod_name = None
-#             for part in stderr_lines:
-#                 if 'firewall2-app' in part:
-#                     pod_name = part.split('/')[-1].rstrip(',')
-#                     break
-
-#             pod = v1.read_namespaced_pod(name=pod_name, namespace='default')  
-#             cpu_request = pod.spec.containers[0].resources.requests['cpu']
-#             memory_request = pod.spec.containers[0].resources.requests['memory']
-
-#             is_crashed_now = crash_logger_global.get_count("firewall2-app") 
-
-#             return cpu_request, memory_request, "0", "0", is_crashed_now
-        
-#         parts = result.stdout.split()
-#         pod_name = parts[4]
-#         pod = v1.read_namespaced_pod(name=pod_name, namespace='default')  
-#         cpu_request = pod.spec.containers[0].resources.requests['cpu']
-#         memory_request = pod.spec.containers[0].resources.requests['memory']
-#         cpu_usage = parts[6] or "0"
-#         memory_usage = parts[7] or "0"
-
-#         is_crashed_now = crash_logger_global.get_count("firewall2-app") 
-
-#         return cpu_request, memory_request, cpu_usage, memory_usage, is_crashed_now
-#     except Exception as e:
-#         print(f"Error retrieving firewall2 pod details: {e}")
-#         is_crashed_now = crash_logger_global.get_count("firewall2-app") 
-#         return "0", "0", "0", "0", is_crashed_now
-    
-# def get_pod_details_nat():
-#     global crash_logger_global
-#     config.load_kube_config(config_file="/home/ubuntu/.kube/config")
-#     v1 = client.CoreV1Api()
-#     try:
-#         result = subprocess.run(["kubectl", "top", "pod", "-l", "app=nat-app", "--containers"], 
-#                               capture_output=True, text=True)
-
-#         if result.returncode != 0 or not result.stdout:
-#             stderr_lines = result.stderr.split()
-#             pod_name = None
-#             for part in stderr_lines:
-#                 if 'nat-app' in part:
-#                     pod_name = part.split('/')[-1].rstrip(',')
-#                     break
-
-#             pod = v1.read_namespaced_pod(name=pod_name, namespace='default')  
-#             cpu_request = pod.spec.containers[0].resources.requests['cpu']
-#             memory_request = pod.spec.containers[0].resources.requests['memory']
-
-#             is_crashed_now = crash_logger_global.get_count("nat-app") 
-
-#             return cpu_request, memory_request, "0", "0", is_crashed_now
-        
-#         parts = result.stdout.split()
-#         pod_name = parts[4]
-#         pod = v1.read_namespaced_pod(name=pod_name, namespace='default')  
-#         cpu_request = pod.spec.containers[0].resources.requests['cpu']
-#         memory_request = pod.spec.containers[0].resources.requests['memory']
-#         cpu_usage = parts[6] or "0"
-#         memory_usage = parts[7] or "0"
-
-#         is_crashed_now = crash_logger_global.get_count("nat-app") 
-
-#         return cpu_request, memory_request, cpu_usage, memory_usage, is_crashed_now
-#     except Exception as e:
-#         print(f"Error retrieving nat pod details: {e}")
-#         is_crashed_now = crash_logger_global.get_count("nat-app") 
-#         return "0", "0", "0", "0", is_crashed_now
-    
-
-# Load config once at the top of the file (or in each function)
-# config.load_kube_config(config_file="/home/ubuntu/.kube/config")
-# v1 = client.CoreV1Api()
-
-def get_pod_details_old(vnf_label: str, vnf_key: str):
-    """Generic function to get pod details for any VNF"""
-    global crash_logger_global
-    
-    try:
-        # Get pod using label selector (much more reliable)
-        pods = v1.list_namespaced_pod(namespace='default', label_selector=f"app={vnf_label}")
-        
-        if not pods.items:
-            print(f"No pod found for label app={vnf_label}")
-            is_crashed = crash_logger_global.get_count(vnf_key)
-            return "0", "0", "0", "0", is_crashed
-
-        pod = pods.items[0]  # Take the first (and usually only) pod
-        pod_name = pod.metadata.name
-
-        # Get resource requests from pod spec
-        container = pod.spec.containers[0]
-        cpu_request = container.resources.requests.get('cpu', '0') if container.resources.requests else '0'
-        memory_request = container.resources.requests.get('memory', '0') if container.resources.requests else '0'
-
-        # Try to get real usage with kubectl top (as fallback)
-        try:
-            result = subprocess.run(
-                ["kubectl", "top", "pod", pod_name, "--containers", "--no-headers"],
-                capture_output=True, text=True, timeout=5
-            )
-            
-            if result.returncode == 0 and result.stdout.strip():
-                parts = result.stdout.strip().split()
-                cpu_usage = parts[1] if len(parts) > 1 else "0"
-                memory_usage = parts[2] if len(parts) > 2 else "0"
-            else:
-                cpu_usage = "0"
-                memory_usage = "0"
-        except:
-            cpu_usage = "0"
-            memory_usage = "0"
-
-        is_crashed_now = crash_logger_global.get_count(vnf_key)
-        
-        return cpu_request, memory_request, cpu_usage, memory_usage, is_crashed_now
-
-    except Exception as e:
-        print(f"Error retrieving {vnf_key} pod details: {e}")
-        is_crashed_now = crash_logger_global.get_count(vnf_key)
-        return "0", "0", "0", "0", is_crashed_now
 
 
-from kubernetes import client, config
-import time
+
 
 # Load config ONCE at the top of your script (outside any function)
 config.load_kube_config(config_file="/home/ubuntu/.kube/config")
@@ -609,12 +316,6 @@ def run_get_crash_status_old(crash_logger_instance: CrashLogger, stop_event: thr
                     # print(f"Warning: Pod {pod_name_full} from status update not matched to a VNF base name.")
                     pass
             
-            # # For any VNF entirely missing from pod status (e.g. deleted), assume crashed
-            # current_status_vnfs = {pod_info.get('Name', '').split('-')[0] + '-app' for pod_info in pods_status_dict.values() if pod_info.get('Name')}
-
-            # for vnf_base in vnf_names:
-            #     if vnf_base not in current_status_vnfs and vnf_base not in missing_vnfs: # if not in kubectl top AND not in pod list
-            #         crash_logger_instance.log_crash(vnf_base, 1)
 
 
         except Exception as e:
@@ -994,7 +695,7 @@ def read_from_database(max_retries=5, retry_delay=1):
 
 def initialize_database():
     """Initialize the VNF KPI database"""
-    conn = sqlite3.connect('VNF_KPI_database_crash_top2_v2_statefull_dyn_15May.db', timeout=10)
+    conn = sqlite3.connect('VNFs_performance_dataset.db', timeout=10)
     cursor = conn.cursor()
     
     create_table_query = """
@@ -1109,7 +810,7 @@ def logging_pod_resources():
              average_rtt, transmission_rate) = results
 
             # Insert into database
-            conn = sqlite3.connect('VNF_KPI_database_crash_top2_v2_statefull_dyn_15May.db', timeout=10)
+            conn = sqlite3.connect('VNFs_performance_dataset.db', timeout=10)
             cursor = conn.cursor()
             
             cursor.execute("""
