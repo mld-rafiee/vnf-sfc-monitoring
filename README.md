@@ -1,12 +1,42 @@
-# VNF-SFC-Monitoring
+# VNF‑SFC Monitoring Testbed
 
-## 🧩 Components
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/)
+[![Kubernetes](https://img.shields.io/badge/kubernetes-1.24%2B-blue)](https://kubernetes.io/)
+
+
+**A Kubernetes‑native testbed for monitoring performance of Virtual Network Functions (VNFs) in Service Function Chains (SFCs).**  
+Designed for edge/5G environments, it generates IoT traffic, measures application‑level (latency), Network-level (traffic load) and infrastructure‑level (CPU, memory) metrics, and detects failures.
+
+## Overview
+
+Monitoring VNFs in a dynamic SFC is critical for ensuring QoS in 5G and edge networks. This project provides:
+
+- Two distinct SFCs (Firewall → DPI → Encryption → Compression and Firewall → DPI → NAT) deployed on Kubernetes.
+- A scalable IoT traffic generator (1000–50,000 IoT devices, 4–50 msg/s).
+- A monitoring service that collects both application metrics (processing delay, traffic load) and infrastructure metrics (CPU/memory usage) from each VNF.
+- Failure detection (crash events) and persistent storage in SQLite.
+- All components are containerised and orchestrated with Kubernetes + Kustomize.
+
+## Components
 
 - **VNFs**: Five network functions (Firewall, DPI, Encryption, Compression, NAT) implemented as Python services.
 - **Kubernetes Manifests**: Kustomize‑based deployment files for multi‑node computing continuum environment.
 - **Traffic Generator**: Emulates IoT sensor data at scale using real‑world bandwidth traces.
 - **Performance Metrics Monitor**: monitoring server that monitors VNF metrics, Kubernetes pod stats, and crash events.
 
+
+## VNFs
+
+| VNF          | Description                                           | SFC(s)       |
+|--------------|-------------------------------------------------------|--------------|
+| **Firewall** | Filters packets based on rules.                       | SFC 1        |
+| **DPI**      | Deep Packet Inspection – classifies traffic.          | Both         |
+| **Encryption**| Encrypts payloads.                                   | SFC 1        |
+| **Compression**| Compresses data to reduce size.                     | SFC 1        |
+| **NAT**      | Network Address Translation.                          | SFC 2        |
+
+Each VNF is containerised and runs as a Kubernetes Deployment with a Service for internal routing.
 
 ## 🚀 Deployment
 
