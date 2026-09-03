@@ -1,4 +1,4 @@
-## A Kubernetes‑native testbed for monitoring performance of Virtual Network Functions (VNFs) in Service Function Chains (SFCs).##
+## A Kubernetes‑native testbed for monitoring performance of Virtual Network Functions (VNFs) in Service Function Chains (SFCs).
 
 **Designed for edge/5G environments, it generates IoT traffic, measures application‑level (latency), Network-level (traffic load) and infrastructure‑level (CPU, memory) metrics, and detects failures.**
 
