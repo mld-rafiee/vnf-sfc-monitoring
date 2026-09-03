@@ -1,12 +1,13 @@
-# VNF‑SFC Monitoring Testbed
+## A Kubernetes‑native testbed for monitoring performance of Virtual Network Functions (VNFs) in Service Function Chains (SFCs).##
+
+**Designed for edge/5G environments, it generates IoT traffic, measures application‑level (latency), Network-level (traffic load) and infrastructure‑level (CPU, memory) metrics, and detects failures.**
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/)
 [![Kubernetes](https://img.shields.io/badge/kubernetes-1.24%2B-blue)](https://kubernetes.io/)
 
 
-**A Kubernetes‑native testbed for monitoring performance of Virtual Network Functions (VNFs) in Service Function Chains (SFCs).**  
-Designed for edge/5G environments, it generates IoT traffic, measures application‑level (latency), Network-level (traffic load) and infrastructure‑level (CPU, memory) metrics, and detects failures.
+
 
 ## Overview
 
